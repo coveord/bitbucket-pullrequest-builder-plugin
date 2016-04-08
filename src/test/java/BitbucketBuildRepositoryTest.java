@@ -189,44 +189,4 @@ public class BitbucketBuildRepositoryTest {
       return null;
     }
   }
-  
-  @Test  
-  public void repositoryProjectIdTest() throws ANTLRException, NoSuchAlgorithmException, UnsupportedEncodingException {
-    BitbucketBuildTrigger trigger = new BitbucketBuildTrigger(
-      "", "@hourly",
-      "JenkinsCID",
-      "foo",
-      "bar",
-      "", "",
-      "", true,
-      "jenkins", "Jenkins", "",
-      true, 
-      true
-    );
-    
-    BitbucketPullRequestsBuilder builder = EasyMock.createMock(BitbucketPullRequestsBuilder.class); 
-    EasyMock.expect(builder.getTrigger()).andReturn(trigger).anyTimes();
-    
-    final MessageDigest MD5 = MessageDigest.getInstance("MD5");
-    
-    String[] projectIds = new String[] { 
-      "one", 
-      "Second project",
-      "Project abstract 1.1",
-      "Good project, careated at " + (new java.util.Date()).toString(),      
-    };   
-    
-    Collection<String> hashedProjectIdsCollection = Collections2.transform(Arrays.asList(projectIds), new MD5HasherFunction(MD5));
-
-    BitbucketRepository repo = new BitbucketRepository("", builder);
-    repo.init();       
-    
-    for(String projectId : projectIds) {
-      String hashMD5 = new String(Hex.encodeHex(MD5.digest(projectId.getBytes("UTF-8"))));
-      String buildStatusKey = repo.getClient().buildStatusKey(repo.getKeyPart());
-      
-      assertTrue(buildStatusKey.length() <= ApiClient.MAX_KEY_SIZE_BB_API);
-      assertEquals(buildStatusKey, "jenkins-" + hashMD5);
-    }
-  }
 }
