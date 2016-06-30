@@ -124,7 +124,9 @@ public class BitbucketRepository {
                     pullRequest.getDestination().getRepository().getRepositoryName(),
                     pullRequest.getTitle(),
                     pullRequest.getSource().getCommit().getHash(),
-                    pullRequest.getDestination().getCommit().getHash());
+                    pullRequest.getDestination().getCommit().getHash(),
+                    pullRequest.getAuthor().getCombinedUsername()
+            );
             setBuildStatus(cause, BuildState.INPROGRESS, Jenkins.getInstance().getRootUrl());
             this.builder.getTrigger().startJob(cause);
         }
@@ -187,12 +189,6 @@ public class BitbucketRepository {
       logger.log(Level.INFO, "Post comment: {0} with original content {1}", new Object[]{ content, this.client.postPullRequestComment(pullRequestId, content).getId() });
     }
     
-    private boolean processTTPCommentBuildTags(String content, String buildKey) {        
-      if (!this.isTTPCommentBuildTags(content)) return true;      
-      logger.log(Level.INFO, "Processing ttp with build comment: {0}",  content);
-      return !this.hasMyBuildTagInTTPComment(content, buildKey);
-    }
-    
     private boolean isTTPComment(String content) {
       return content.toLowerCase().contains(BUILD_REQUEST_MARKER.toLowerCase());
     }
@@ -242,6 +238,7 @@ public class BitbucketRepository {
             boolean rebuildCommentAvailable = false;
             if (comments != null) {
                 Collection<Pullrequest.Comment> filteredComments = this.filterPullRequestComments(comments);
+                boolean hasMyBuildTag = false;
                 for (Pullrequest.Comment comment : filteredComments) {
                     String content = comment.getContent();
                     if (this.isTTPComment(content)) {  
@@ -250,10 +247,11 @@ public class BitbucketRepository {
                           "Rebuild comment available for commit {0} and comment #{1}", 
                           new Object[]{ sourceCommit, comment.getId() }
                         );                        
-                    }                                       
-                    rebuildCommentAvailable &= this.processTTPCommentBuildTags(content, keyPart);
-                    if (!rebuildCommentAvailable) break;
+                    }
+                    if (isTTPCommentBuildTags(content))
+                        hasMyBuildTag |= this.hasMyBuildTagInTTPComment(content, keyPart);
                 }
+                rebuildCommentAvailable &= !hasMyBuildTag;
             }            
             if (rebuildCommentAvailable) this.postBuildTagInTTPComment(id, "TTP build flag", keyPart);
 
@@ -289,7 +287,8 @@ public class BitbucketRepository {
           pullRequest.getDestination().getRepository().getRepositoryName(),
           pullRequest.getTitle(),
           pullRequest.getSource().getCommit().getHash(),
-          pullRequest.getDestination().getCommit().getHash()
+          pullRequest.getDestination().getCommit().getHash(),
+          pullRequest.getAuthor().getCombinedUsername()
         );
         
         //@FIXME: Way to iterate over all available SCMSources
