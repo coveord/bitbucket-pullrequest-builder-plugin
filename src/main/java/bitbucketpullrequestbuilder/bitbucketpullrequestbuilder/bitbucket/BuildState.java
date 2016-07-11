@@ -6,5 +6,5 @@ package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
  * @see https://confluence.atlassian.com/bitbucket/buildstatus-resource-779295267.html
  */
 public enum BuildState {
-    FAILED, INPROGRESS, SUCCESSFUL
+    FAILED, INPROGRESS, SUCCESSFUL, UNKNOWN
 }

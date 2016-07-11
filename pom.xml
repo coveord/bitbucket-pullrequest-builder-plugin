@@ -3,9 +3,13 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.509.4</version><!-- which version of Jenkins is this plugin built against? -->         
+    <version>2.9</version>
   </parent>
 
+  <properties>
+    <jenkins.version>1.651.1</jenkins.version> <!-- which version of Jenkins is this plugin built against? -->
+  </properties>
+  
   <artifactId>bitbucket-pullrequest-builder</artifactId>
   <name>Bitbucket Pullrequest Builder Plugin</name>
   <version>1.4.20-SNAPSHOT</version>
@@ -59,7 +63,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>git</artifactId>
-      <version>2.2.4</version>
+      <version>2.2.9</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
