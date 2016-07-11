@@ -139,6 +139,23 @@ public class ApiClient {
         return get(url).contains("\"state\"");
     }
 
+    public BuildState getBuildStatus(String owner, String repositoryName, String revision, String keyEx) {
+        BuildState buildState = BuildState.UNKNOWN;
+        String computedKey = this.computeAPIKey(keyEx);
+        String url = v2(owner, repositoryName, "/commit/" + revision + "/statuses/build/" + computedKey);
+        try {
+            String retrievedBuildState = parse(get(url), BuildStatus.class).getState();
+            if (retrievedBuildState != null) {
+                buildState = BuildState.valueOf(retrievedBuildState);
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Invalid commit build status response.", e);
+            e.printStackTrace();
+        }
+
+        return buildState;
+    }
+
     public void setBuildStatus(String owner, String repositoryName, String revision, BuildState state, String buildUrl, String comment, String keyEx) {
         String url = v2(owner, repositoryName, "/commit/" + revision + "/statuses/build");
         String computedKey = this.computeAPIKey(keyEx);

@@ -139,13 +139,18 @@ public class BitbucketRepository {
         String repository = cause.getRepositoryName();
         String destinationBranch = cause.getTargetBranch();
 
-        logger.info("setBuildStatus " + state + " for commit: " + sourceCommit + " with url " + buildUrl);
+        BuildState existingBuildState = this.client.getBuildStatus(owner, repository, sourceCommit, keyPart);
+        if(existingBuildState == state) {
+            logger.info("Found existing build with same state. Not setting build state.");
+        } else {
+            logger.info("setBuildStatus " + state + " for commit: " + sourceCommit + " with url " + buildUrl);
 
-        if (state == BuildState.FAILED || state == BuildState.SUCCESSFUL) {
-            comment = String.format(BUILD_DESCRIPTION, builder.getProject().getDisplayName(), sourceCommit, destinationBranch);
+            if (state == BuildState.FAILED || state == BuildState.SUCCESSFUL) {
+                comment = String.format(BUILD_DESCRIPTION, builder.getProject().getDisplayName(), sourceCommit, destinationBranch);
+            }
+
+            this.client.setBuildStatus(owner, repository, sourceCommit, state, buildUrl, comment, keyPart);
         }
-
-        this.client.setBuildStatus(owner, repository, sourceCommit, state, buildUrl, comment, keyPart);
     }
 
     public void deletePullRequestApproval(String pullRequestId) {
