@@ -144,10 +144,10 @@ public class ApiClient {
         String computedKey = this.computeAPIKey(keyEx);
         String url = v2(owner, repositoryName, "/commit/" + revision + "/statuses/build/" + computedKey);
         try {
-            BuildStatus buildStatus = parse(get(url), BuildStatus.class);
-            buildState = BuildState.valueOf(buildStatus.getState());
-        } catch (NullPointerException e) {
-            // Thrown when there is no build status, move on...
+            String retrievedBuildState = parse(get(url), BuildStatus.class).getState();
+            if (retrievedBuildState != null) {
+                buildState = BuildState.valueOf(retrievedBuildState);
+            }
         } catch (IOException e) {
             logger.log(Level.WARNING, "Invalid commit build status response.", e);
             e.printStackTrace();

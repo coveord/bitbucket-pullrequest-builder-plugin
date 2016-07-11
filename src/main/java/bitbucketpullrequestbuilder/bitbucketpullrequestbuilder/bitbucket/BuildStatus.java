@@ -1,12 +1,14 @@
 package bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.bitbucket;
 
-/**
- * Created by dblanchette
- */
-
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * POJO representing the pull-requests extracted from the
+ * JSON response of the Bitbucket API V2.
+ *
+ * @see https://confluence.atlassian.com/bitbucket/buildstatus-resource-779295267.html
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BuildStatus {
 
